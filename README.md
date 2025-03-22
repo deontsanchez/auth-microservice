@@ -133,15 +133,65 @@ Run tests with:
 npm test
 ```
 
-## TypeScript Type Definitions
+## Example Usage in Code
 
-The project includes comprehensive type definitions for:
+### Middleware Usage Example
 
-- User and Token models
-- JWT payloads
-- Request and response objects
-- Controller return types
-- RabbitMQ messages
+```typescript
+// Authentication middleware
+const authMiddleware = (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+};
+```
+
+Using arrow function syntax:
+
+```typescript
+// Authentication middleware with arrow function
+const authMiddleware = (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+};
+```
+
+### Service Example
+
+```typescript
+// User service with arrow functions
+const createUser = async userData => {
+  const hashedPassword = await bcrypt.hash(userData.password, 10);
+  const user = await User.create({
+    ...userData,
+    password: hashedPassword,
+  });
+  return user;
+};
+
+const findUserById = async id => {
+  return await User.findById(id).select('-password');
+};
+```
 
 ## RabbitMQ Events
 
@@ -152,6 +202,26 @@ The service publishes the following events:
 - `user.deleted` - When a user is deleted
 - `user.login` - When a user logs in
 - `user.logout` - When a user logs out
+
+### Event Publisher Example
+
+```typescript
+// RabbitMQ publisher with arrow function
+const publishEvent = async (exchange, routingKey, message) => {
+  try {
+    const connection = await amqplib.connect(process.env.RABBITMQ_URL);
+    const channel = await connection.createChannel();
+
+    await channel.assertExchange(exchange, 'topic', { durable: true });
+    channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(message)));
+
+    await channel.close();
+    await connection.close();
+  } catch (error) {
+    console.error('Error publishing event:', error);
+  }
+};
+```
 
 ## License
 
