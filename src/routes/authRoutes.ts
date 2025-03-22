@@ -9,18 +9,26 @@ import {
 import { protect } from '../middlewares/auth';
 import { body } from 'express-validator';
 import { asyncHandler } from '../utils/routeHandler';
+import { authLimiter, registrationLimiter } from '../middlewares/rateLimiter';
 
 const router = express.Router();
 
 // Register user
 router.post(
   '/register',
+  registrationLimiter,
   [
     body('name').notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Please include a valid email'),
     body('password')
-      .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters long'),
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters long')
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/
+      )
+      .withMessage(
+        'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character'
+      ),
   ],
   asyncHandler(register)
 );
@@ -28,6 +36,7 @@ router.post(
 // Login user
 router.post(
   '/login',
+  authLimiter,
   [
     body('email').isEmail().withMessage('Please include a valid email'),
     body('password').exists().withMessage('Password is required'),

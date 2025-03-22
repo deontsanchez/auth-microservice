@@ -8,9 +8,13 @@ export interface IUser extends Document {
   role: 'user' | 'admin';
   isActive: boolean;
   lastLogin: Date | null;
+  failedLoginAttempts: number;
+  lockUntil: Date | null;
   createdAt: Date;
   updatedAt: Date;
   matchPassword(enteredPassword: string): Promise<boolean>;
+  incrementLoginAttempts(): Promise<void>;
+  resetLoginAttempts(): Promise<void>;
 }
 
 export interface IToken extends Document {

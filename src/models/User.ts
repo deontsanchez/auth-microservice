@@ -15,7 +15,8 @@ const userSchema = new Schema<IUser>(
     password: {
       type: String,
       required: [true, 'Password is required'],
-      minlength: [6, 'Password must be at least 6 characters long'],
+      minlength: [8, 'Password must be at least 8 characters long'],
+      // Validation moved to express-validator due to complexity
     },
     name: {
       type: String,
@@ -32,6 +33,14 @@ const userSchema = new Schema<IUser>(
       default: true,
     },
     lastLogin: {
+      type: Date,
+      default: null,
+    },
+    failedLoginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lockUntil: {
       type: Date,
       default: null,
     },
@@ -62,6 +71,29 @@ userSchema.methods.matchPassword = async function (
   enteredPassword: string
 ): Promise<boolean> {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Method to handle failed login attempts
+userSchema.methods.incrementLoginAttempts = async function (): Promise<void> {
+  // Increment failed login attempts
+  this.failedLoginAttempts += 1;
+
+  // Lock account if too many failed attempts (5)
+  if (this.failedLoginAttempts >= 5) {
+    // Lock for 30 minutes
+    const lockUntil = new Date();
+    lockUntil.setMinutes(lockUntil.getMinutes() + 30);
+    this.lockUntil = lockUntil;
+  }
+
+  await this.save();
+};
+
+// Method to reset failed login attempts
+userSchema.methods.resetLoginAttempts = async function (): Promise<void> {
+  this.failedLoginAttempts = 0;
+  this.lockUntil = null;
+  await this.save();
 };
 
 const User = mongoose.model<IUser>('User', userSchema);

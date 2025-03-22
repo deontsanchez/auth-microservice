@@ -73,6 +73,7 @@ JWT_SECRET=your_jwt_secret_key_here
 JWT_EXPIRES_IN=1d
 RABBITMQ_URL=amqp://localhost:5672
 NODE_ENV=development
+SESSION_SECRET=your_session_secret_key_here
 ```
 
 Note: When running with Docker, the MongoDB and RabbitMQ URLs should use the service names:
