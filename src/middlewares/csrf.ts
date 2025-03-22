@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import Tokens = require('csrf');
-import { SessionData } from 'express-session';
+import Tokens from 'csrf';
 
 // Extend express-session to include our CSRF secret
 declare module 'express-session' {
@@ -59,11 +58,18 @@ export const validateCsrfToken = (
     return;
   }
 
-  // Get token from request header or body
-  const token =
+  // Get token from request header, body, or cookies
+  let token =
     req.headers['x-csrf-token'] ||
     req.headers['x-xsrf-token'] ||
     req.body._csrf;
+
+  // If token isn't in headers or body, try to get it from cookies
+  if (!token && req.cookies && req.cookies['XSRF-TOKEN']) {
+    token = req.cookies['XSRF-TOKEN'];
+    // Add it to headers for future middleware
+    req.headers['x-xsrf-token'] = token;
+  }
 
   if (!token || typeof token !== 'string') {
     res.status(403).json({
