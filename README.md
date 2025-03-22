@@ -9,7 +9,6 @@ A standalone authentication microservice built with TypeScript, Node.js, MongoDB
 - Role-based access control (user/admin)
 - User management (CRUD operations)
 - Event publishing with RabbitMQ (for inter-service communication)
-- Docker and docker-compose for easy deployment
 - Full TypeScript implementation with strong typing
 
 ## Technologies
@@ -19,36 +18,29 @@ A standalone authentication microservice built with TypeScript, Node.js, MongoDB
 - MongoDB with Mongoose ODM
 - RabbitMQ for messaging
 - JWT for authentication
-- Docker for containerization
 - Jest for testing
 
 ## Getting Started
 
 ### Prerequisites
 
-- Docker and docker-compose
-- Node.js (for local development)
+- Node.js
 - TypeScript
+- MongoDB
+- RabbitMQ
 
 ### Installation
 
 1. Clone the repository
-2. Run with docker-compose:
-
-```bash
-docker-compose up -d
-```
-
-For development with hot reload:
-
-```bash
-docker-compose up auth-dev
-```
-
-For local development:
+2. Install dependencies:
 
 ```bash
 npm install
+```
+
+3. Run the development server:
+
+```bash
 npm run dev     # Runs ts-node directly
 # or
 npm run watch   # Runs with nodemon for auto-reload
@@ -74,13 +66,6 @@ JWT_EXPIRES_IN=1d
 RABBITMQ_URL=amqp://localhost:5672
 NODE_ENV=development
 SESSION_SECRET=your_session_secret_key_here
-```
-
-Note: When running with Docker, the MongoDB and RabbitMQ URLs should use the service names:
-
-```
-MONGODB_URI=mongodb://mongo:27017/auth-service
-RABBITMQ_URL=amqp://rabbitmq:5672
 ```
 
 ## API Endpoints
