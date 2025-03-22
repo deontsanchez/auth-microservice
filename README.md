@@ -68,11 +68,18 @@ Create a `.env` file with the following variables:
 
 ```
 PORT=3000
-MONGODB_URI=mongodb://mongo:27017/auth-service
+MONGODB_URI=mongodb://localhost:27017/auth-service
 JWT_SECRET=your_jwt_secret_key_here
 JWT_EXPIRES_IN=1d
-RABBITMQ_URL=amqp://rabbitmq:5672
+RABBITMQ_URL=amqp://localhost:5672
 NODE_ENV=development
+```
+
+Note: When running with Docker, the MongoDB and RabbitMQ URLs should use the service names:
+
+```
+MONGODB_URI=mongodb://mongo:27017/auth-service
+RABBITMQ_URL=amqp://rabbitmq:5672
 ```
 
 ## API Endpoints
